@@ -24,6 +24,10 @@ const ShipMedicine = () => {
         return;
       }
 
+      // Store distributor address in localStorage
+      localStorage.setItem("distributorAddress", formData.distributor);
+      console.log("Distributor address saved to localStorage:", formData.distributor);
+
       // Initialize ethers.js provider and signer
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();

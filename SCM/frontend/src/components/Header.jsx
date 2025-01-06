@@ -1,34 +1,42 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ethers } from 'ethers';
-import { HiMenu } from "react-icons/hi"; // Import the hamburger icon from React Icons
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { ethers } from "ethers";
+import { HiMenu } from "react-icons/hi";
 
 const Header = () => {
   const [account, setAccount] = useState(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  async function connectToMetamask() {
+  useEffect(() => {
+    // Load account from localStorage if it exists
+    const savedAccount = localStorage.getItem("connectedAccount");
+    if (savedAccount) {
+      setAccount(savedAccount);
+    }
+  }, []);
+
+  const connectToMetamask = async () => {
     try {
       if (typeof window.ethereum !== "undefined") {
         const provider = new ethers.BrowserProvider(window.ethereum);
-        const addr = await provider.getSigner();
-        console.log(addr);
-        
         const accounts = await provider.send("eth_requestAccounts", []);
         setAccount(accounts[0]);
+        localStorage.setItem("connectedAccount", accounts[0]); // Save to localStorage
         alert("Connected account: " + accounts[0]);
       } else {
-        console.error("MetaMask not installed");
+        alert("MetaMask not installed");
       }
     } catch (error) {
       console.error("Connection failed", error);
+      alert("Failed to connect to MetaMask");
     }
-  }
+  };
 
-  function logout() {
+  const logout = () => {
     setAccount(null);
+    localStorage.removeItem("connectedAccount"); // Clear from localStorage
     alert("Disconnected from MetaMask");
-  }
+  };
 
   return (
     <header className="bg-gradient-to-r from-blue-600 to-slate-500 shadow-lg">
@@ -39,27 +47,22 @@ const Header = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-8">
-          <Link to={"/"} className="text-white hover:text-yellow-300 transition duration-300">Home</Link>
-          <Link to={"/tracking"} className="text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
-          <Link to={"/about"} className="text-white hover:text-yellow-300 transition duration-300">About</Link>
-          <div className="flex items-center space-x-4">
-            {!account ? (
-              <button
-                onClick={connectToMetamask}
-                className="text-white bg-green-500 hover:bg-green-400 px-4 py-2 rounded-lg transition duration-300 shadow-lg"
-              >
-                Connect To Metamask
-              </button>
-            ) : (
-              <button
-                onClick={logout}
-                className="text-white bg-red-500 hover:bg-red-400 px-4 py-2 rounded-lg transition duration-300 shadow-lg"
-              >
-                Disconnect
-              </button>
-            )}
-          </div>
+        <nav className="hidden md:flex space-x-8">          <Link to="/tracking" className="text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
+          {!account ? (
+            <button
+              onClick={connectToMetamask}
+              className="text-white bg-green-500 hover:bg-green-400 px-4 py-2 rounded-lg transition duration-300 shadow-lg"
+            >
+              Connect To Metamask
+            </button>
+          ) : (
+            <button
+              onClick={logout}
+              className="text-white bg-red-500 hover:bg-red-400 px-4 py-2 rounded-lg transition duration-300 shadow-lg"
+            >
+              Disconnect
+            </button>
+          )}
         </nav>
 
         {/* Hamburger Menu for Mobile */}
@@ -67,7 +70,6 @@ const Header = () => {
           className="block md:hidden text-white focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
         >
-          {/* React Hamburger Icon */}
           <HiMenu size={24} />
         </button>
       </div>
@@ -77,13 +79,7 @@ const Header = () => {
         <nav className="md:hidden bg-slate-800 shadow-lg">
           <ul className="space-y-4 py-6 text-center">
             <li>
-              <Link to={"/"} className="block text-white hover:text-yellow-300 transition duration-300">Home</Link>
-            </li>
-            <li>
-              <Link to={"/tracking"} className="block text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
-            </li>
-            <li>
-              <Link to={"/about"} className="block text-white hover:text-yellow-300 transition duration-300">About</Link>
+              <Link to="/tracking" className="block text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
             </li>
             <li>
               {!account ? (

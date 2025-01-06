@@ -5,7 +5,6 @@ import Header from '../components/Header'
 const Tracking = () => {
   return (
     <div>
-      <Header/>
       <GetMedicineDetails/>
     </div>
   )

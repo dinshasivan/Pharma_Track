@@ -1,23 +1,16 @@
-import { ethers } from 'ethers';
-import React, { useState, useEffect } from 'react';
-import ABI from '../assets/TrackMedicine.json';
-import address from '../assets/deployed_addresses.json';
+import React, { useState, useEffect } from "react";
+import { ethers } from "ethers";
+import ABI from "../assets/TrackMedicine.json";
+import address from "../assets/deployed_addresses.json";
 
-const GetMedicineDetails = () => {
+const MedicineTracker = () => {
+  const [id, setId] = useState("");
   const [medicineDetails, setMedicineDetails] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load data from localStorage when component mounts
-  useEffect(() => {
-    const storedDetails = JSON.parse(localStorage.getItem('medicineDetails'));
-    if (storedDetails) {
-      setMedicineDetails(storedDetails);
-    }
-  }, []);
-
-  async function getMedicineDetails(event) {
+  // Fetch medicine details
+  const getMedicineDetails = async (event) => {
     event.preventDefault();
-    const id = document.getElementById('id').value;
 
     try {
       setLoading(true);
@@ -26,52 +19,69 @@ const GetMedicineDetails = () => {
       const signer = await provider.getSigner();
 
       const CAbi = ABI.abi;
-      const contractAddress = address['TrackModule#TrackMedicine'];
-
+      const contractAddress = address["TrackModule#TrackMedicine"];
       const medicineInstance = new ethers.Contract(contractAddress, CAbi, signer);
 
       const exists = await medicineInstance.medicines(id);
+      const { name, manufacturer, distributor, retailer, dates } = exists;
 
-      // Extracting the medicine details
-      const {
-        name,
-        manufacturer,
-        distributor,
-        retailer,
-        dates
-      } = exists;
+      const manufacturingDate = dates?.m_Date || null;
+      const packingDate = dates?.p_Date || null;
+      const shippingDate = dates?.s_Date || null;
+      const pickupDate = dates?.picDate || null;
+      const storingDate = dates?.storeDate || null;
+      const deliveryDate = dates?.d_Date || null;
 
-      // Check if dates are defined
-      const manufacturingDate = dates?.m_Date || 'N/A';
-      const packingDate = dates?.p_Date || 'N/A';
-      const shippingDate = dates?.s_Date || 'N/A';
-      const pickupDate = dates?.picDate || 'N/A';
-      const storingDate = dates?.storeDate || 'N/A';
-      const deliveryDate = dates?.d_Date || 'N/A';
+      let status = "Not Started";
+      if (manufacturingDate) status = "Manufactured";
+      if (packingDate) status = "Packed";
+      if (shippingDate) status = "Shipped";
+      if (pickupDate) status = "Picked";
+      if (storingDate) status = "Stored";
+      if (deliveryDate) status = "Delivered";
 
-      // Append the new data to the existing state
-      const newMedicineDetails = [
-        ...medicineDetails,
-        {
-          id,
-          name,
-          manufacturer,
-          manufacturingDate,
-          packingDate,
-          shippingDate,
-          distributor,
-          pickupDate,
-          storingDate,
-          retailer,
-          deliveryDate
-        }
-      ];
+      const existingIndex = medicineDetails.findIndex((medicine) => medicine.id === id);
 
-      // Save the updated details to localStorage
-      localStorage.setItem('medicineDetails', JSON.stringify(newMedicineDetails));
+      const updatedMedicineDetails =
+        existingIndex !== -1
+          ? medicineDetails.map((medicine, idx) =>
+              idx === existingIndex
+                ? {
+                    id,
+                    name,
+                    manufacturer,
+                    manufacturingDate: manufacturingDate || "N/A",
+                    packingDate: packingDate || "N/A",
+                    shippingDate: shippingDate || "N/A",
+                    distributor,
+                    pickupDate: pickupDate || "N/A",
+                    storingDate: storingDate || "N/A",
+                    retailer,
+                    deliveryDate: deliveryDate || "N/A",
+                    status,
+                  }
+                : medicine
+            )
+          : [
+              ...medicineDetails,
+              {
+                id,
+                name,
+                manufacturer,
+                manufacturingDate: manufacturingDate || "N/A",
+                packingDate: packingDate || "N/A",
+                shippingDate: shippingDate || "N/A",
+                distributor,
+                pickupDate: pickupDate || "N/A",
+                storingDate: storingDate || "N/A",
+                retailer,
+                deliveryDate: deliveryDate || "N/A",
+                status,
+              },
+            ];
 
-      // Update state with the new details
-      setMedicineDetails(newMedicineDetails);
+      localStorage.setItem("medicineDetails", JSON.stringify(updatedMedicineDetails));
+      setMedicineDetails(updatedMedicineDetails);
 
       setLoading(false);
     } catch (error) {
@@ -79,110 +89,109 @@ const GetMedicineDetails = () => {
       alert("Error fetching medicine details. Please try again.");
       setLoading(false);
     }
-  }
+  };
+
+  // Retrieve from localStorage on component load
+  useEffect(() => {
+    const savedData = JSON.parse(localStorage.getItem("medicineDetails")) || [];
+    setMedicineDetails(savedData);
+  }, []);
 
   return (
-    <>
-      <div className="max-w-xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-4">
-        {/* Form Section */}
-        <div className="mb-6">
-          <h2 className="text-2xl font-bold mb-4 text-gray-800 text-center">Track Medicine Details</h2>
-          <form className="space-y-4" onSubmit={getMedicineDetails}>
-            {/* Batch ID */}
-            <div>
-              <label htmlFor="batchId" className="block text-sm font-medium text-gray-700">
-                Batch ID
-              </label>
-              <input
-                type="text"
-                id="id"
-                name="batchId"
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
-                placeholder="Enter Batch ID"
-                required
-              />
-            </div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-2xl sm:text-3xl font-bold mb-4 text-center">Track Medicine</h1>
 
-            {/* Submit Button */}
-            <div className="text-center">
-              <button
-                type="submit"
-                className="w-full py-2 px-4 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
-                disabled={loading}
-              >
-                {loading ? 'Loading...' : 'Track Medicine'}
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      <form
+        onSubmit={getMedicineDetails}
+        className="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-center"
+      >
+        <label className="block sm:inline-block mb-2 sm:mb-0 sm:mr-4 font-medium text-gray-700">
+          Enter Batch ID:
+        </label>
+        <input
+          type="text"
+          id="id"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          required
+          className="border border-gray-300 p-2 rounded w-full sm:w-1/2 mb-4 sm:mb-0"
+        />
+        <button
+          type="submit"
+          disabled={loading}
+          className={`w-full sm:w-auto bg-blue-500 text-white py-2 px-4 rounded ${
+            loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          {loading ? "Fetching..." : "Track Medicine"}
+        </button>
+      </form>
 
-      <div className="max-w-8xl mx-auto px-6">
-        {/* Medicine Details Table Section */}
-        <div className="mt-6 overflow-x-auto shadow-md rounded-lg">
-          <table className="min-w-full table-auto border-collapse border border-gray-200">
+      {medicineDetails.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="table-auto border-collapse w-full border border-gray-300">
             <thead className="bg-gray-100">
               <tr>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Batch ID</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Manufacturer</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Manufacturing Date</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Medicine Name</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Packing Date</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Shipping Date</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Distributor</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Pickup Date</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Storing Date</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Retailer</th>
-                <th className="border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700">Delivery Date</th>
+                {[
+                  "Batch ID",
+                  "Manufacturer",
+                  "Manufacturing Date",
+                  "Medicine Name",
+                  "Packing Date",
+                  "Shipping Date",
+                  "Distributor",
+                  "Pickup Date",
+                  "Storing Date",
+                  "Retailer",
+                  "Delivery Date",
+                  "Status",
+                ].map((header, index) => (
+                  <th
+                    key={index}
+                    className="border border-gray-300 px-4 py-2 text-sm md:text-base font-medium text-gray-700"
+                  >
+                    {header}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {medicineDetails.map((medicine, index) => (
                 <tr
                   key={index}
-                  className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50"} hover:bg-gray-100`}
+                  className={`${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  } hover:bg-gray-100`}
                 >
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.id}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.manufacturer}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.manufacturingDate}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.name}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.packingDate}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.shippingDate}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.distributor}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.pickupDate}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.storingDate}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.retailer}
-                  </td>
-                  <td className="border border-gray-300 px-4 py-2 text-sm text-gray-700">
-                    {medicine.deliveryDate}
-                  </td>
+                  {[
+                    medicine.id,
+                    `${medicine.manufacturer.slice(0, 6)}...${medicine.manufacturer.slice(-4)}`,
+                    medicine.manufacturingDate,
+                    medicine.name,
+                    medicine.packingDate,
+                    medicine.shippingDate,
+                    `${medicine.distributor.slice(0, 6)}...${medicine.distributor.slice(-4)}`,
+                    medicine.pickupDate,
+                    medicine.storingDate,
+                    `${medicine.retailer.slice(0, 6)}...${medicine.retailer.slice(-4)}`,
+                    medicine.deliveryDate,
+                    medicine.status,
+                  ].map((value, subIndex) => (
+                    <td
+                      key={subIndex}
+                      className="border border-gray-300 px-4 py-2 text-sm md:text-base text-gray-700"
+                    >
+                      {value}
+                    </td>
+                  ))}
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
-export default GetMedicineDetails;
+export default MedicineTracker;
