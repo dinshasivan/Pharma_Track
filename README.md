@@ -42,10 +42,10 @@ To interact with the blockchain and deploy the smart contract, follow these step
     cd hardhat
     npm install -D hardhat @nomicfoundation/hardhat-toolbox
 
-2.Set up your environmental variables by creating ```bash .env file in the root of the project with the following content:      
+2.Set up your environmental variables by creating ```.env``` file in the root of the project with the following content:      
     ```bash
     SEPOLIA_URL = your_sepolia_rpc_url
-    PRIVATE_KEY = your_private_key
+    PRIVATE_KEY = your_private_key```
 Replace your_sepolia_rpc_url with your own Sepolia network URL (e.g., from Infura or Alchemy), and your_private_key with the private key of your Sepolia account.
 
 3.Here's the hardhat.config.js file you'll be using:
