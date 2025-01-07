@@ -18,33 +18,28 @@
 To run the project locally, follow these steps:
 
 1.Clone the repository:
-    ```bash
-    git@github.com:dinshasivan/Pharma_Track.git
+    ```git@github.com:dinshasivan/Pharma_Track.git```
 
 2.Navigate to the project directory:
-    ```bash
-    cd Pharma_Track
+    ```cd Pharma_Track```
 
 3.Install the dependencies:
-    ```bash
-    npm install
+    ```npm install```
 
 4.Start the project:
-    ```bash
-    npm run dev
+    ```npm run dev
 
 ## Smart Contract Setup with Hardhat
 
 To interact with the blockchain and deploy the smart contract, follow these steps:
 
 1.Install Hardhat and the required dependencies:
-    ```bash
+    ```
     cd hardhat
-    npm install -D hardhat @nomicfoundation/hardhat-toolbox
+    npm install -D hardhat @nomicfoundation/hardhat-toolbox```
 
 2.Set up your environmental variables by creating ```.env``` file in the root of the project with the following content:      
-    ```bash
-    SEPOLIA_URL = your_sepolia_rpc_url
+    ```SEPOLIA_URL = your_sepolia_rpc_url
     PRIVATE_KEY = your_private_key```
 Replace your_sepolia_rpc_url with your own Sepolia network URL (e.g., from Infura or Alchemy), and your_private_key with the private key of your Sepolia account.
 
