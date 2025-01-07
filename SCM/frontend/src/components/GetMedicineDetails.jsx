@@ -15,10 +15,10 @@ const MedicineTracker = () => {
     try {
       setLoading(true);
 
-      const provider = new ethers.BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
+      const provider = new ethers.BrowserProvider(window.ethereum);//provider api injected by metamask
+      const signer = await provider.getSigner();// get the signer using getSigner function
 
-      const CAbi = ABI.abi;
+      const CAbi = ABI.abi; // abi is the skeleton of the smart contract
       const contractAddress = address["TrackModule#TrackMedicine"];
       const medicineInstance = new ethers.Contract(contractAddress, CAbi, signer);
 

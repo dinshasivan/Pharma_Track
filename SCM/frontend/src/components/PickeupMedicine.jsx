@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ABI from "../assets/TrackMedicine.json";
 import address from "../assets/deployed_addresses.json";
 import { ethers } from 'ethers';
@@ -6,7 +6,7 @@ import { ethers } from 'ethers';
 const PickMedicine = () => {
   const [formData, setFormData] = useState({
     batchId: 0,
-    picDate: "", // Changed to picDate to match the smart contract
+    picDate: "", 
   });
 
   const handleChange = (event) => {
@@ -14,14 +14,40 @@ const PickMedicine = () => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
+   // Event Listener for contract events
+  useEffect(() => {
+    const setupEventListener = async () => {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(
+          address["TrackModule#TrackMedicine"],
+          ABI.abi,
+          provider
+        );
+
+        contract.on("StatusUpdated", (batchId, status) => {
+          alert(`Batch ID: ${batchId} - Status Updated: ${status}`);
+          console.log(`Event: Batch ID ${batchId}, Status: ${status}`);
+        });
+
+        return () => {
+          contract.removeAllListeners("StatusUpdated");
+        };
+      } catch (error) {
+        console.error("Error setting up event listener:", error);
+      }
+    };
+
+    setupEventListener();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Initialize ethers.js provider and signer
+      // get connected address
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // Contract ABI and address
       const Cabi = ABI.abi;
       const Caddress = address["TrackModule#TrackMedicine"];
 
@@ -32,20 +58,18 @@ const PickMedicine = () => {
       console.log("Batch ID:", parseInt(formData.batchId));
       console.log("Pick Date:", formData.picDate);
 
-      // Execute transaction
+      // call function using created contract instance
       const transaction = await medicineInstance.pickMedicine(
         parseInt(formData.batchId),
-        formData.picDate // Pass the correct parameter (picDate)
+        formData.picDate 
       );
       console.log("Transaction submitted:", transaction);
 
-      // Wait for transaction confirmation
       await transaction.wait();
       alert("Medicine picked successfully!");
     } catch (error) {
       console.error("Error during transaction:", error);
 
-      // Provide a user-friendly error message
       if (error.reason) {
         alert(`Transaction failed: ${error.reason}`);
       } else if (error.message) {
@@ -68,7 +92,7 @@ const PickMedicine = () => {
           <input
             type="text"
             id="batchId"
-            name="batchId" // Add name for proper handling
+            name="batchId" 
             value={formData.batchId}
             onChange={handleChange}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
@@ -84,9 +108,9 @@ const PickMedicine = () => {
           </label>
           <input
             type="date"
-            id="picDate" // Changed to picDate
-            name="picDate" // Added name for proper handling
-            value={formData.picDate} // Use picDate to match the contract parameter
+            id="picDate" 
+            name="picDate" 
+            value={formData.picDate} 
             onChange={handleChange}
             className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
             required

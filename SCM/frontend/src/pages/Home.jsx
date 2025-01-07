@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import Manufacture from '../components/Manufacture.jsx';
 import PackMedicine from '../components/PackMedicine.jsx';
-import Header from '../components/Header.jsx';
 import ShipMedicine from '../components/ShipMedicine.jsx';
 import PickupMedicine from '../components/PickeupMedicine.jsx';
 import StoreMedicine from '../components/StoreMedicine.jsx';
@@ -84,7 +83,7 @@ const Home = () => {
             Your trusted platform for managing pharmaceutical processes with ease and efficiency.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full px-4">
-            {/* Buttons for deployer */}
+            {/* components  for manufacturer */}
             {connectedAddress && connectedAddress != distributedAddress.toLowerCase() &&  (
               <>
                 <button
@@ -108,7 +107,7 @@ const Home = () => {
               </>
             )}
 
-            {/* Buttons for distributor */}
+            {/* components for distributor */}
             {connectedAddress && connectedAddress === distributedAddress.toLowerCase() && (
               <>
                 <button

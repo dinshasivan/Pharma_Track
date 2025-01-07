@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import ABI from "../assets/TrackMedicine.json";
 import address from "../assets/deployed_addresses.json";
@@ -15,10 +15,37 @@ const ShipMedicine = () => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
+   // Event Listener for contract events
+  useEffect(() => {
+    const setupEventListener = async () => {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(
+          address["TrackModule#TrackMedicine"],
+          ABI.abi,
+          provider
+        );
+
+        contract.on("StatusUpdated", (batchId, status) => {
+          alert(`Batch ID: ${batchId} - Status Updated: ${status}`);
+          console.log(`Event: Batch ID ${batchId}, Status: ${status}`);
+        });
+
+        return () => {
+          contract.removeAllListeners("StatusUpdated");
+        };
+      } catch (error) {
+        console.error("Error setting up event listener:", error);
+      }
+    };
+
+    setupEventListener();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Validate distributor address
+      // check the input is ethereum address or not
       if (!ethers.isAddress(formData.distributor)) {
         alert("Invalid distributor address. Please enter a valid Ethereum address.");
         return;
@@ -28,11 +55,10 @@ const ShipMedicine = () => {
       localStorage.setItem("distributorAddress", formData.distributor);
       console.log("Distributor address saved to localStorage:", formData.distributor);
 
-      // Initialize ethers.js provider and signer
+      // get the connected account
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // Contract ABI and address
       const Cabi = ABI.abi;
       const Caddress = address["TrackModule#TrackMedicine"];
 
@@ -44,16 +70,16 @@ const ShipMedicine = () => {
       console.log("Ship Date:", formData.shipDate);
       console.log("Distributor:", formData.distributor);
 
-      // Call the contract function
+      // Call the contract function using created contract instance
       const transaction = await medicineInstance.shipMedicine(
-        parseInt(formData.batchId), // Convert to integer
-        formData.shipDate, // Ship date as string
-        formData.distributor // Distributor address
+        parseInt(formData.batchId), 
+        formData.shipDate, 
+        formData.distributor 
       );
 
       console.log("Transaction submitted:", transaction);
 
-      // Wait for transaction confirmation
+      
       const receipt = await transaction.wait();
       console.log("Transaction confirmed:", receipt);
 
@@ -61,7 +87,7 @@ const ShipMedicine = () => {
     } catch (error) {
       console.error("Error shipping medicine:", error);
 
-      // Provide a user-friendly error message
+      
       if (error.reason) {
         alert(`Transaction failed: ${error.reason}`);
       } else if (error.message) {

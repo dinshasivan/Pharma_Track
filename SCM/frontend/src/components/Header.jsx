@@ -8,7 +8,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    // Load account from localStorage if it exists
+    // get account from localStorage 
     const savedAccount = localStorage.getItem("connectedAccount");
     if (savedAccount) {
       setAccount(savedAccount);
@@ -21,7 +21,7 @@ const Header = () => {
         const provider = new ethers.BrowserProvider(window.ethereum);
         const accounts = await provider.send("eth_requestAccounts", []);
         setAccount(accounts[0]);
-        localStorage.setItem("connectedAccount", accounts[0]); // Save to localStorage
+        localStorage.setItem("connectedAccount", accounts[0]); 
         alert("Connected account: " + accounts[0]);
       } else {
         alert("MetaMask not installed");
@@ -34,7 +34,7 @@ const Header = () => {
 
   const logout = () => {
     setAccount(null);
-    localStorage.removeItem("connectedAccount"); // Clear from localStorage
+    localStorage.removeItem("connectedAccount"); //  address Clear from localStorage
     alert("Disconnected from MetaMask");
   };
 
@@ -47,7 +47,7 @@ const Header = () => {
         </div>
 
         {/* Navigation Links */}
-        <nav className="hidden md:flex space-x-8">          <Link to="/tracking" className="text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
+        <nav className="hidden md:flex space-x-8"> <Link to="/tracking" className="text-white hover:text-yellow-300 transition duration-300">Tracking</Link>
           {!account ? (
             <button
               onClick={connectToMetamask}
@@ -65,7 +65,7 @@ const Header = () => {
           )}
         </nav>
 
-        {/* Hamburger Menu for Mobile */}
+        {/* Menubar for Mobile */}
         <button
           className="block md:hidden text-white focus:outline-none"
           onClick={() => setIsMenuOpen(!isMenuOpen)}

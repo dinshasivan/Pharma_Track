@@ -24,17 +24,17 @@ describe('TrackMedicine', function () {
     // Pack the medicine
     await Track.packMedicine(1, "7/13/2024");
 
-    // Ship the medicine to the distributor (we're using the `other` account as the distributor here)
+    // Ship the medicine 
     await Track.shipMedicine(1, "7/14/2024", other.address);
 
-    // Retrieve the medicine details to check the status and shipping date
+    // Retrieve the medicine
     const tracking = await Track.medicines(1);
 
-    // Check that the shipping date is set correctly
+    // Check that the shipping 
     expect(tracking.dates.s_Date).to.equal("7/14/2024");
     expect(tracking.status).to.equal(2); // Status.Shipped = 2
 
-    // Verify that the distributor address is set
+    // Verify that the distributor address
     expect(tracking.distributor).to.equal(other.address);
   });
 
@@ -47,7 +47,7 @@ describe('TrackMedicine', function () {
     // Pack the medicine
     await Track.packMedicine(1, "7/13/2024");
 
-    // Ship the medicine to the distributor (we're using the `other` account as the distributor here)
+    // Ship the medicine to the distributor 
     await expect(Track.shipMedicine(1, "7/14/2024", other.address))
       .to.emit(Track, 'StatusUpdated')
       .withArgs(1, 2); // Check for the correct batch ID (1) and status (2: Shipped)

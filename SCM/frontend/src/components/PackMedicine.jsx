@@ -1,5 +1,5 @@
 import { ethers } from "ethers";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ABI from "../assets/TrackMedicine.json";
 import address from "../assets/deployed_addresses.json";
 
@@ -14,14 +14,40 @@ const PackMedicine = () => {
     setFormData((prevState) => ({ ...prevState, [name]: value }));
   };
 
+  useEffect(() => {
+    const setupEventListener = async () => {
+      try {
+        const provider = new ethers.BrowserProvider(window.ethereum);
+        const contract = new ethers.Contract(
+          address["TrackModule#TrackMedicine"],
+          ABI.abi,
+          provider
+        );
+
+        contract.on("StatusUpdated", (batchId, status) => {
+          alert(`Batch ID: ${batchId} - Status Updated: ${status}`);
+          console.log(`Event: Batch ID ${batchId}, Status: ${status}`);
+        });
+
+        return () => {
+          contract.removeAllListeners("StatusUpdated");
+        };
+      } catch (error) {
+        console.error("Error setting up event listener:", error);
+      }
+    };
+
+    setupEventListener();
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      // Initialize ethers.js provider and signer
+      
       const provider = new ethers.BrowserProvider(window.ethereum);
       const signer = await provider.getSigner();
 
-      // Contract ABI and address
+      
       const Cabi = ABI.abi;
       const Caddress = address["TrackModule#TrackMedicine"];
 
@@ -33,7 +59,7 @@ const PackMedicine = () => {
       console.log("Pack Date:", formData.packDate);
 
       
-      // Execute transaction
+      // call function using instance
       const transaction = await medicineInstance.packMedicine(
         parseInt(formData.batchId),
         formData.packDate,
@@ -46,7 +72,7 @@ const PackMedicine = () => {
     } catch (error) {
       console.error("Error during transaction:", error);
 
-      // Provide a user-friendly error message
+      
       if (error.reason) {
         alert(`Transaction failed: ${error.reason}`);
       } else if (error.message) {
@@ -77,7 +103,8 @@ const PackMedicine = () => {
             name="batchId"
             value={formData.batchId}
             onChange={handleChange}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 
+            rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
             placeholder="Enter Batch ID"
             required
           />
@@ -97,7 +124,8 @@ const PackMedicine = () => {
             name="packDate"
             value={formData.packDate}
             onChange={handleChange}
-            className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
+            className="mt-1 block w-full px-4 py-2 border border-gray-300 
+            rounded-md shadow-sm focus:outline-none focus:ring-cyan-500 focus:border-cyan-500 sm:text-sm"
             required
           />
         </div>
@@ -106,7 +134,8 @@ const PackMedicine = () => {
         <div className="text-center">
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-cyan-600 text-white font-semibold rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
+            className="w-full py-2 px-4 bg-cyan-600 text-white font-semibold 
+            rounded-lg hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2"
           >
             Pack Medicine
           </button>

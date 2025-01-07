@@ -30,7 +30,6 @@ contract TrackMedicine {
     }
 
     mapping(uint256 => Medicine) public medicines; // Batch ID to Medicine
-    mapping(string => uint256) public nameToBatchId; // Medicine name to Batch ID
 
     address public manufacturer;
 
@@ -62,8 +61,6 @@ contract TrackMedicine {
         string memory _mDate,
         int8 _temp
     ) public onlyManufacturer {
-        require(nameToBatchId[_name] == 0, "Medicine name already exists");
-
         medicines[_batchId] = Medicine({
             name: _name,
             quantity: _quantity,
@@ -76,7 +73,6 @@ contract TrackMedicine {
             location: Location({ storageLocation: "" })
         });
 
-        nameToBatchId[_name] = _batchId;
 
         emit StatusUpdated(_batchId, Status.Manufactured);
     }
@@ -151,9 +147,4 @@ contract TrackMedicine {
         emit StatusUpdated(_batchId, Status.Delivered);
     }
 
-    function getMedicineDetailsByName(string memory _name) public view returns (Medicine memory) {
-        uint256 batchId = nameToBatchId[_name];
-        require(batchId != 0, "Medicine not found");
-        return medicines[batchId];
-    }
 }

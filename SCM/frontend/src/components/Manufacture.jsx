@@ -13,7 +13,7 @@ const ManufactureMedicine = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  // Update form data on change
+  // Update form data 
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
