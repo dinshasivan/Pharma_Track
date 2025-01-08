@@ -12,7 +12,6 @@ and allows everyone involved to securely access important information.
 ![](https://img.shields.io/badge/HTML5-informational?style=flat&logo=HTML5&color=FF4500)
 ![](https://img.shields.io/badge/TailwindCSS-informational?style=flat&logo=TailwindCSS&color=00BFFF)
 ![](https://img.shields.io/badge/React-informational?style=flat&logo=React&color=4CAF50)
-![](https://img.shields.io/badge/Node.js-informational?style=flat&logo=Node.js&color=FFD700)
 
 ![](https://img.shields.io/badge/Solidity-informational?style=flat&logo=Solidity&color=4E44CE)
 ![](https://img.shields.io/badge/Ethereum-informational?style=flat&logo=Ethereum&color=6CACE4)
