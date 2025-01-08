@@ -1,7 +1,10 @@
 # Pharma_Track
 
 ### Overview
-**PharmaTrack** is a Medicine Supply Chain Traceability System that uses blockchain technology to make the medicine supply chain safer, more transparent, and easier to track. It helps prevent counterfeit drugs, tracks medicines from production to delivery, and allows everyone involved to securely access important information.
+**PharmaTrack** is a Medicine Supply Chain Traceability System that uses blockchain 
+technology to make the medicine supply chain safer, more transparent, and easier to track. 
+It helps prevent counterfeit drugs, tracks medicines from production to delivery, 
+and allows everyone involved to securely access important information.
 
 ---
 
@@ -21,48 +24,47 @@
 
 To run the project locally, follow these steps:
 
-1. **Clone the repository**:
-    ```bash
-    git clone git@github.com:dinshasivan/Pharma_Track.git
-    ```
+### Frontend Setup
 
-2. **Navigate to the project directory**:
+1. Clone the repository:
     ```bash
-    cd Pharma_Track
+    git clone https://github.com/vishnuajithg/CertifyChain.git
     ```
-
-3. **Install the dependencies**:
+2. Navigate to the project directory:
+    ```bash
+    cd PharmaTrack
+    ```
+3. Install the dependencies:
     ```bash
     npm install
     ```
-
-4. **Start the project**:
+4. Start the project:
     ```bash
     npm run dev
     ```
-
+    
 ---
 
 ## Smart Contract Setup with Hardhat
 
 To interact with the blockchain and deploy the smart contract, follow these steps:
 
-1. **Install Hardhat and required dependencies**:
+1. Install Hardhat and the required dependencies:
     ```bash
-    cd hardhat
+    cd CertifyChain
     npm install -D hardhat @nomicfoundation/hardhat-toolbox
     ```
 
-2. **Set up your environment variables**:
-    Create a `.env` file in the root of the project with the following content:
-    ```plaintext
+2. Set up your environment variables by creating a `.env` file in the root of the project with the following content:
+    ```bash
     SEPOLIA_URL=your_sepolia_rpc_url
     PRIVATE_KEY=your_private_key
     ```
-    Replace `your_sepolia_rpc_url` with your Sepolia network RPC URL (e.g., from Infura or Alchemy), and `your_private_key` with the private key of your Sepolia account.
+    
+    Replace `your_sepolia_rpc_url` with your own Sepolia network URL (e.g., from Infura or Alchemy), and `your_private_key` with the private key of your Sepolia account.
 
-3. **Configure Hardhat**:
-    Update the `hardhat.config.js` file with the following content:
+3. Here's the `hardhat.config.js` file you'll be using:
+
     ```javascript
     require("@nomicfoundation/hardhat-toolbox");
 
@@ -78,7 +80,7 @@ To interact with the blockchain and deploy the smart contract, follow these step
           accounts: [process.env.PRIVATE_KEY],
         },
         holesky: {
-          url: "https://eth-holesky.g.alchemy.com/v2/YOUR_ALCHEMY_API_KEY",
+          url: process.env.HOLSKEY_URL,
           accounts: [process.env.PRIVATE_KEY],
         },
       },
